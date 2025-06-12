@@ -30,7 +30,7 @@ The system features a patient-friendly **web interface** that accepts symptom in
 
 ## Architecture Overview
 
-![Architecture](screenshots/architecture.png.png)
+![Architecture](screenshots/architecture.png)
 
 1. User types raw symptoms in the React client.
 
