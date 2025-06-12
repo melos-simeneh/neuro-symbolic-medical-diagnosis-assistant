@@ -16,10 +16,6 @@ def add_symptoms_to_knowledge_base(metta, patient_name, symptoms):
     symptoms_to_add = [sym for sym in symptoms if sym not in existing_flat]
     symptoms_to_remove = [sym for sym in existing_flat if sym not in symptoms]
 
-    if not symptoms_to_add:
-        print(f"\nℹ️ All symptoms for {patient_name} are already recorded in the KB.\n")
-        return
-
     for symptom in symptoms_to_remove:
         remove_symptom_from_kb(metta, patient_name, symptom)
 
@@ -27,7 +23,9 @@ def add_symptoms_to_knowledge_base(metta, patient_name, symptoms):
         symptom_id+=1
         add_symptom_to_kb(metta,symptom_id,patient_name,symptom)
 
-    if symptoms_to_add:
+    if not symptoms_to_add:
+        print(f"\nℹ️ All symptoms for {patient_name} are already recorded in the KB.\n")
+    else:
         symptoms_formatted = "\n".join(f"  • {symptom}" for symptom in symptoms_to_add)
         print(f"\n➕ Added new symptoms for {patient_name}:\n{symptoms_formatted}\n")
     
