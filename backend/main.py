@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError
+from fastapi.exceptions import RequestValidationError
 from fastapi import FastAPI
 from hyperon import MeTTa
 from fastapi.middleware.cors import CORSMiddleware
+from typing import  Dict
 
 from schemas.diagnosis_schema import DiagnosisRequest
 
@@ -15,6 +16,7 @@ app = FastAPI(
     description="Combines LLMs (Gemini) and symbolic reasoning (MeTTa) to infer likely diagnoses from symptoms.",
     version="1.0.0"
 )
+
 metta = MeTTa()
 
 # Allow requests from your frontend origin
@@ -31,11 +33,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app = FastAPI(
-    title="Neuro-Symbolic Medical Diagnosis API",
-    description="Combines LLMs (Gemini) and symbolic reasoning (MeTTa) to infer likely diagnoses from symptoms.",
-    version="1.0.0"
-)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
@@ -53,14 +50,23 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         },
     )
 
-@app.exception_handler(ValidationError)
-async def validation_exception_handler(request: Request, exc: ValidationError):
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+
+    def format_error(err: Dict) -> str:
+        field_path = ".".join(str(loc) for loc in err.get("loc", []) if loc != "body")
+        msg = err.get("msg", "Invalid input")
+        return f"{field_path}: {msg}"
+
+    formatted_errors = [format_error(error) for error in exc.errors()]
+    print(f"[Validation Error]: {formatted_errors}")
+
     return JSONResponse(
         status_code=422,
         content={
             "success": False,
-            "message": "Validation failed",
-            "details": exc.errors()
+            "message": "Validation error",
+            "errors": formatted_errors
         },
     )
 
@@ -71,7 +77,7 @@ async def general_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={
             "success": False,
-            "message": "An unexpected error occurred.",
+            "message": "Internal Server Error",
         },
     )
 
