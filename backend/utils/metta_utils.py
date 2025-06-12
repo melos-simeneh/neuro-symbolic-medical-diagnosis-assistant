@@ -11,7 +11,23 @@ def add_symptom_to_kb(metta,sym_id,patient_name,symptom):
     metta.run(metta_code)
 
 def remove_symptom_from_kb(metta,patient_name,symptom):
-    metta_code = f"!(remove-atom &self (: $x (Evaluation has_symptom {patient_name} {symptom})))"
+    metta_code = f"""
+                (=(get_id)
+                    (match &self (: $y (Evaluation has_symptom {patient_name} {symptom})) $y)
+                )
+
+                (=(delete $id)
+                    (remove-atom &self (: $id (Evaluation has_symptom {patient_name} {symptom})))
+                    )
+
+                !(let* 
+                    (
+                        ($id (get_id))
+                        ($result (delete $id))
+                    )
+                    ($result)
+                )
+    """
     metta.run(metta_code)
     
 def get_patient_symptoms_from_kb(metta, patient_name):
