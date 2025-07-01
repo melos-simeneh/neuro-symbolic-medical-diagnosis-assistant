@@ -73,7 +73,7 @@ The system features a patient-friendly **web interface** that accepts symptom in
 #### 1. Clone the repository:
 
 ```bash
-git clone https://github.com/melos/neuro-symbolic-medical-diagnosis-assistant.git
+git clone https://github.com/melos-simeneh/neuro-symbolic-medical-diagnosis-assistant.git
 cd neuro-symbolic-medical-diagnosis-assistant
 ```
 
